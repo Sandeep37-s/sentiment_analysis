@@ -92,6 +92,8 @@ def logout():
     session.pop('admin', None)
     return redirect('/login')
 
+init_db()
+
 if __name__ == '__main__':
-    init_db()  # Ensure database and tables are created
+      # Ensure database and tables are created
     app.run(debug=True)
