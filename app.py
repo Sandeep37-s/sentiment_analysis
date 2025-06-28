@@ -36,7 +36,7 @@ def init_db():
     # Insert default admin if not exists
     c.execute("SELECT * FROM admin WHERE username='admin'")
     if not c.fetchone():
-        c.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin123"))
+        c.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("sandeep", "sandeep17"))
     conn.commit()
     conn.close()
 
