@@ -63,13 +63,13 @@
 
     {% if sentiment %}
       <div class="result">
-        🧠 Predicted Sentiment: 
+        🧠 Predicted Sentiment:
         {% if sentiment == 'pos' %}
-          <span style="color: green;">Positive 😊</span>
+          <span style="color: green;"> Positive 😊</span>
         {% elif sentiment == 'neg' %}
-          <span style="color: red;">Negative 😠</span>
+          <span style="color: red;"> Negative 😠</span>
         {% else %}
-          {{ sentiment }}
+          <span>{{ sentiment }}</span>
         {% endif %}
       </div>
     {% endif %}
