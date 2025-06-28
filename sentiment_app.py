@@ -1,23 +1,44 @@
 from flask import Flask, render_template, request, redirect, session
 import joblib
-import mysql.connector
+import sqlite3
 import re
+import os
+from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # for session management
 
 # Load sentiment model
-model = joblib.load('C:/Users/sande/Downloads/flask/sentiment_analysis/sentiment_model.pkl')
+model = joblib.load('sentiment_model.pkl')
 
+# Database setup
+DB_NAME = 'sentiment.db'
 
-# Connect to XAMPP MySQL
-db = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    password="",         # default XAMPP password is blank
-    database="sentiment_analysis"
-)
-cursor = db.cursor()
+def init_db():
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS user_inputs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            user_text TEXT NOT NULL,
+            sentiment TEXT NOT NULL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS admin (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL
+        )
+    ''')
+    # Insert default admin if not exists
+    c.execute("SELECT * FROM admin WHERE username='admin'")
+    if not c.fetchone():
+        c.execute("INSERT INTO admin (username, password) VALUES (?, ?)", ("admin", "admin123"))
+    conn.commit()
+    conn.close()
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
@@ -28,9 +49,12 @@ def home():
         sentiment = model.predict([user_text])[0]
 
         # Save to DB
-        cursor.execute("INSERT INTO user_inputs (username, user_text, sentiment) VALUES (%s, %s, %s)",
-                       (username, user_text, sentiment))
-        db.commit()
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute("INSERT INTO user_inputs (username, user_text, sentiment) VALUES (?, ?, ?)",
+                  (username, user_text, sentiment))
+        conn.commit()
+        conn.close()
 
         return render_template('index.html', sentiment=sentiment)
     return render_template('index.html')
@@ -40,8 +64,11 @@ def login():
     if request.method == 'POST':
         uname = request.form['username']
         passwd = request.form['password']
-        cursor.execute("SELECT * FROM admin WHERE username=%s AND password=%s", (uname, passwd))
-        result = cursor.fetchone()
+        conn = sqlite3.connect(DB_NAME)
+        c = conn.cursor()
+        c.execute("SELECT * FROM admin WHERE username=? AND password=?", (uname, passwd))
+        result = c.fetchone()
+        conn.close()
         if result:
             session['admin'] = uname
             return redirect('/admin')
@@ -53,8 +80,11 @@ def login():
 def admin():
     if 'admin' not in session:
         return redirect('/login')
-    cursor.execute("SELECT * FROM user_inputs ORDER BY timestamp DESC")
-    records = cursor.fetchall()
+    conn = sqlite3.connect(DB_NAME)
+    c = conn.cursor()
+    c.execute("SELECT * FROM user_inputs ORDER BY timestamp DESC")
+    records = c.fetchall()
+    conn.close()
     return render_template('admin.html', records=records)
 
 @app.route('/logout')
@@ -63,5 +93,5 @@ def logout():
     return redirect('/login')
 
 if __name__ == '__main__':
+    init_db()  # Ensure database and tables are created
     app.run(debug=True)
-  # Localhost
