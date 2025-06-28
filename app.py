@@ -9,7 +9,7 @@ app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # for session management
 
 # Load sentiment model
-model = joblib.load('sentiment_model.pkl')
+model = joblib.load('predict.pkl')
 
 # Database setup
 DB_NAME = 'sentiment.db'
