@@ -17,10 +17,22 @@
       border-radius: 15px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     }
+    h2 {
+      margin-bottom: 25px;
+      font-weight: bold;
+    }
     .btn-login {
       width: 100%;
       background-color: #6f42c1;
       color: white;
+      font-weight: bold;
+      border-radius: 10px;
+    }
+    .error-message {
+      margin-top: 10px;
+      color: red;
+      font-weight: bold;
+      text-align: center;
     }
   </style>
 </head>
@@ -29,17 +41,17 @@
     <h2 class="text-center">🔐 Admin Login</h2>
     <form method="POST">
       <div class="mb-3">
-        <label>Username:</label>
-        <input type="text" class="form-control" name="username" required>
+        <label for="username" class="form-label">Username:</label>
+        <input type="text" class="form-control" name="username" id="username" placeholder="Enter admin username" required>
       </div>
       <div class="mb-3">
-        <label>Password:</label>
-        <input type="password" class="form-control" name="password" required>
+        <label for="password" class="form-label">Password:</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Enter password" required>
       </div>
       {% if error %}
-        <p style="color:red;">{{ error }}</p>
+        <div class="error-message">{{ error }}</div>
       {% endif %}
-      <button type="submit" class="btn btn-login">Login</button>
+      <button type="submit" class="btn btn-login mt-3">Login</button>
     </form>
   </div>
 </body>
