@@ -3,6 +3,10 @@ scikit-learn==1.5.1
 joblib==1.4.2
 nltk==3.9.1
 mysql-connector-python==9.3.0
-python-dotenv==1.0.1  # Optional but helpful for managing secrets
-gunicorn==22.0.0      # Required for production servers like Render
+python-dotenv==1.0.1
+gunicorn==22.0.0
+pandas==2.2.2
+numpy==1.26.4
+seaborn==0.13.2
+matplotlib==3.9.2
 
